@@ -91,8 +91,18 @@ void Screen::input(Player* player) {
   }
 }
 
+// Draw a collection of pixels WITHOUT color data
 void Screen::drawShape(std::vector<SDL_FPoint> pixels) {
   for (auto& pixel : pixels) {
     SDL_RenderDrawPointF(renderer, pixel.x, pixel.y);
+  }
+}
+
+// Draw a collecttion of pixels with color data for each pixel
+void Screen::drawShape(std::vector<std::pair<SDL_FPoint, SDL_Color>> pixels) {
+  for (auto& pixel : pixels) {
+    SDL_Color color = pixel.second;
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderDrawPointF(renderer, pixel.first.x, pixel.first.y);
   }
 }

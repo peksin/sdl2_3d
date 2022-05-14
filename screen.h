@@ -24,4 +24,5 @@ class Screen {
     void show(Player* player);
     void input(Player* player);
     void drawShape(std::vector<SDL_FPoint> pixels);
+    void drawShape(std::vector<std::pair<SDL_FPoint, SDL_Color>> pixels);
 };
