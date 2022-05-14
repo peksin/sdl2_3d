@@ -5,6 +5,7 @@
 
 #include "screen.h"
 #include "player.h"
+#include "camera.h"
 
 
 // A pixel with 3d coordinates 
@@ -23,11 +24,6 @@ Screen::Screen() {
   SDL_Init(SDL_INIT_VIDEO);
   SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
   SDL_RenderSetScale(renderer, 1, 1);
-
-  fullscreen.x = 0;
-  fullscreen.y = 0;
-  fullscreen.w = SCREEN_WIDTH;
-  fullscreen.h = SCREEN_HEIGHT;
 
   // Set top right viewport size
   topRightViewport.x = SCREEN_WIDTH / 2;
@@ -61,8 +57,8 @@ void Screen::show(Player* player) {
   /*****************************
   * Draw to fullscreen viewport
   *****************************/
-
-  SDL_RenderSetViewport(renderer, &fullscreen);
+  SDL_RenderSetScale(renderer, 1, 1);
+  SDL_RenderSetViewport(renderer, nullptr);
   
   // Draw viewport borders
   SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
@@ -75,9 +71,27 @@ void Screen::show(Player* player) {
   /****************************
   * Draw to top right viewport
   ****************************/
+  SDL_RenderSetScale(renderer, 1, 1);
   SDL_RenderSetViewport(renderer, &topRightViewport);
   SDL_RenderDrawRect(renderer, &rekt);
-  drawShape(player->render());
+  
+  // Camera will follow the player and everything will be rendered
+  // relative to it inside this viewport
+  camera.x = player->x;
+  camera.y = player->y;
+  
+  // Calculate center of viewport
+  float width = topRightViewport.w / 2;
+  float height = topRightViewport.h / 2;
+
+  // How much do I need to add/subtract to get the player coordinates 
+  // to center of viewport
+  float x_offset = player->x - width;
+  float y_offset = player->y - height;
+
+
+
+  drawShape(player->render(x_offset, y_offset));
 
 
   

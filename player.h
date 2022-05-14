@@ -13,7 +13,7 @@ class Player {
     int length;
 
     Player();
-    std::vector<std::pair<SDL_FPoint, SDL_Color>> render();
+    std::vector<std::pair<SDL_FPoint, SDL_Color>> render(float x_off = 0, float y_off = 0);
     void move(float dx, float dy);
     void walk(int speed);
     void rotate(int dAngle);

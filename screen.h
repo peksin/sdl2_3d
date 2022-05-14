@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "player.h"
+#include "camera.h"
 
 #pragma once
 
@@ -17,9 +18,9 @@ class Screen {
     std::vector<SDL_FPoint> points;
     // Define a rectangle
     SDL_Rect rekt;
+    Camera camera;
 
     // Create a viewports
-    SDL_Rect fullscreen;
     SDL_Rect topRightViewport;
     SDL_Rect topRightBorder;
     

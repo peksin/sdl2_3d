@@ -14,7 +14,7 @@ Player::Player() {
 }
 
 // Draw the player character (line)
-std::vector<std::pair<SDL_FPoint, SDL_Color>> Player::render() {
+std::vector<std::pair<SDL_FPoint, SDL_Color>> Player::render(float x_off, float y_off) {
   std::vector<std::pair<SDL_FPoint, SDL_Color>> pixels;
   std::pair<SDL_FPoint, SDL_Color> pixel;
 
@@ -26,8 +26,8 @@ std::vector<std::pair<SDL_FPoint, SDL_Color>> Player::render() {
   color.a = SDL_ALPHA_OPAQUE;
 
   // Make the first pixel white
-  pixel.first.x = x + std::cos(radAngle);
-  pixel.first.y = y + std::sin(radAngle);
+  pixel.first.x = (x + std::cos(radAngle)) - x_off;
+  pixel.first.y = (y + std::sin(radAngle)) - y_off;
   pixel.second = color;
   pixels.push_back(pixel);
 
@@ -38,8 +38,8 @@ std::vector<std::pair<SDL_FPoint, SDL_Color>> Player::render() {
 
   // Start from second pixel because the first is already made
   for (int i = 2; i < length; i++) {
-    pixel.first.x = x + std::cos(radAngle) * i;
-    pixel.first.y = y + std::sin(radAngle) * i;
+    pixel.first.x = (x + std::cos(radAngle) * i) - x_off;
+    pixel.first.y = (y + std::sin(radAngle) * i) - y_off;
     pixels.push_back(pixel);
   }
   return pixels;
