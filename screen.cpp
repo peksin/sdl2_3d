@@ -22,7 +22,24 @@ const int MVMT_SPEED = 1;
 Screen::Screen() {
   SDL_Init(SDL_INIT_VIDEO);
   SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
-  SDL_RenderSetScale(renderer, 2, 2);
+  SDL_RenderSetScale(renderer, 1, 1);
+
+  fullscreen.x = 0;
+  fullscreen.y = 0;
+  fullscreen.w = SCREEN_WIDTH;
+  fullscreen.h = SCREEN_HEIGHT;
+
+  // Set top right viewport size
+  topRightViewport.x = SCREEN_WIDTH / 2;
+  topRightViewport.y = SCREEN_HEIGHT / 4;
+  topRightViewport.w = SCREEN_WIDTH / 3;
+  topRightViewport.h = SCREEN_HEIGHT / 3;
+
+  // Set viewport border
+  topRightBorder.x = topRightViewport.x - 5;
+  topRightBorder.y = topRightViewport.y -5;
+  topRightBorder.w = topRightViewport.w + 5;
+  topRightBorder.h = topRightViewport.h + 5; 
 
 
 
@@ -41,15 +58,30 @@ void Screen::show(Player* player) {
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
   
-  // Draw with red
-  SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-  drawShape(points); // Will probably be useless soon
+  /*****************************
+  * Draw to fullscreen viewport
+  *****************************/
 
-  SDL_RenderDrawLineF(renderer, 150, 150, 250, 290);
+  SDL_RenderSetViewport(renderer, &fullscreen);
+  
+  // Draw viewport borders
+  SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+  SDL_RenderDrawRect(renderer, &topRightBorder);
+  
   SDL_RenderDrawRect(renderer, &rekt);
 
   drawShape(player->render());
   
+  /****************************
+  * Draw to top right viewport
+  ****************************/
+  SDL_RenderSetViewport(renderer, &topRightViewport);
+  SDL_RenderDrawRect(renderer, &rekt);
+  drawShape(player->render());
+
+
+  
+  // Draw everything that's been rendered on the viewports
   SDL_RenderPresent(renderer);
 }
 

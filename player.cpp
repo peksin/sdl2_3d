@@ -7,7 +7,7 @@
 #include "math.h"
 
 Player::Player() {
-  x = 400;
+  x = 200;
   y = 200;
   angle = 0; // degrees
   length = 10;

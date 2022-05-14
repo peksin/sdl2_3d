@@ -18,6 +18,12 @@ class Screen {
     // Define a rectangle
     SDL_Rect rekt;
 
+    // Create a viewports
+    SDL_Rect fullscreen;
+    SDL_Rect topRightViewport;
+    SDL_Rect topRightBorder;
+    
+
     Screen();
 
     void pixel(float x, float y);
