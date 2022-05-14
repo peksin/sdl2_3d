@@ -73,7 +73,6 @@ void Screen::show(Player* player) {
   ****************************/
   SDL_RenderSetScale(renderer, 1, 1);
   SDL_RenderSetViewport(renderer, &topRightViewport);
-  SDL_RenderDrawRect(renderer, &rekt);
   
   // Camera will follow the player and everything will be rendered
   // relative to it inside this viewport
@@ -89,11 +88,14 @@ void Screen::show(Player* player) {
   float x_offset = player->x - width;
   float y_offset = player->y - height;
 
-
-
   drawShape(player->render(x_offset, y_offset));
+  
+  rekt.x -= x_offset;
+  rekt.y -= y_offset;
+  SDL_RenderDrawRect(renderer, &rekt);
 
-
+  rekt.x += x_offset;
+  rekt.y += y_offset;
   
   // Draw everything that's been rendered on the viewports
   SDL_RenderPresent(renderer);
