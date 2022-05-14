@@ -4,6 +4,8 @@
 #include <vector>
 
 #include "screen.h"
+#include "player.h"
+
 
 // A pixel with 3d coordinates 
 struct vec3 {
@@ -11,14 +13,18 @@ struct vec3 {
 };
 
 
+
 // Screen dimension constants
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
+const int MVMT_SPEED = 1;
 
 Screen::Screen() {
   SDL_Init(SDL_INIT_VIDEO);
   SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
-  SDL_RenderSetScale(renderer, 1, 1);
+  SDL_RenderSetScale(renderer, 2, 2);
+
+
 
   rekt.x = 210;
   rekt.y = 210;
@@ -30,26 +36,24 @@ void Screen::pixel(float x, float y) {
   points.emplace_back(x, y);
 }
 
-void Screen::show() {
+void Screen::show(Player* player) {
   // Clear out the screen with black
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
   
   // Draw with red
   SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-  for (auto& point : points) {
-    SDL_RenderDrawPointF(renderer, point.x, point.y);
-  }
+  drawShape(points); // Will probably be useless soon
 
   SDL_RenderDrawLineF(renderer, 150, 150, 250, 290);
-
-
   SDL_RenderDrawRect(renderer, &rekt);
+
+  drawShape(player->render());
   
   SDL_RenderPresent(renderer);
 }
 
-void Screen::input() {
+void Screen::input(Player* player) {
   while (SDL_PollEvent(&e)) {
     if (e.type == SDL_QUIT) {
       SDL_DestroyRenderer(renderer);
@@ -62,8 +66,23 @@ void Screen::input() {
       std::cerr << "Button pressed: ";
       std::cerr << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
       switch (e.key.keysym.sym) {
-        case SDLK_UP:
-          moveRect(&rekt, 0, 10);
+        case SDLK_UP: // MOVE FORWARD
+          player->walk(MVMT_SPEED);
+          break;
+        case SDLK_DOWN: // MOVE BACK
+          player->walk(-MVMT_SPEED);
+          break;
+        case SDLK_LEFT: // ROTATE LEFT
+          player->rotate(-10);
+          break;
+        case SDLK_RIGHT: // ROTATE RIGHT
+          player->rotate(10);
+          break;
+        case SDLK_COMMA: // STRAFE LEFT
+          player->move(-1, 0);
+          break;
+        case SDLK_PERIOD: // STRAFE RIGHT
+          player->move(1, 0);
           break;
         default:
           break;
@@ -72,10 +91,8 @@ void Screen::input() {
   }
 }
 
-void Screen::moveRect(SDL_Rect* rectangle, int dx, int dy) {
-  std::cerr << rectangle->x << " " << rectangle->y << std::endl;
-  rectangle->x += dx;
-  rectangle->y += dy; 
-
-  std::cerr << rectangle->x << " " << rectangle->y << std::endl;  
-} 
+void Screen::drawShape(std::vector<SDL_FPoint> pixels) {
+  for (auto& pixel : pixels) {
+    SDL_RenderDrawPointF(renderer, pixel.x, pixel.y);
+  }
+}

@@ -3,7 +3,11 @@
 #include <iostream>
 #include <vector>
 
+#include "player.h"
+
 #pragma once
+
+
 
 class Screen {
   public:
@@ -17,7 +21,7 @@ class Screen {
     Screen();
 
     void pixel(float x, float y);
-    void show();
-    void input();
-    void moveRect(SDL_Rect* rectangle, int dx, int dy);
+    void show(Player* player);
+    void input(Player* player);
+    void drawShape(std::vector<SDL_FPoint> pixels);
 };
