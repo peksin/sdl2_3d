@@ -14,11 +14,17 @@ Player::Player() {
 }
 
 // Draw the player character (line)
-std::vector<std::pair<SDL_FPoint, SDL_Color>> Player::render(float x_off, float y_off) {
+std::vector<std::pair<SDL_FPoint, SDL_Color>> Player::render(float x_off, float y_off, int paramAngle) {
   std::vector<std::pair<SDL_FPoint, SDL_Color>> pixels;
   std::pair<SDL_FPoint, SDL_Color> pixel;
 
-  float radAngle = degToRad(angle);
+  float radAngle;
+  if (paramAngle != 0) {
+    radAngle = degToRad(paramAngle);
+  } else {
+    radAngle = degToRad(Player::angle);
+  }
+
   SDL_Color color;
   color.r = 255;
   color.g = 255;
@@ -61,5 +67,11 @@ void Player::walk(int speed) {
 }
 
 void Player::rotate(int dAngle) {
-  angle += dAngle;
+  int newAngle = Player::angle + dAngle;
+  newAngle = fmod(newAngle, 360);
+  if ( newAngle < 0) {
+    newAngle += 360;
+  }
+
+  Player::angle = newAngle;
 }

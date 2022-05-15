@@ -71,9 +71,9 @@ void Screen::show(Player* player) {
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
   
-  /*****************************
+  /***********************************************************
   * Draw to fullscreen viewport
-  *****************************/
+  *************************************************************/
   //SDL_RenderSetScale(renderer, 1, 1);
   SDL_RenderSetViewport(renderer, nullptr);
   
@@ -88,9 +88,10 @@ void Screen::show(Player* player) {
   drawLines(renderer, lines);
   //drawLine(renderer, &testLine);
   
-  /****************************
+  /************************************************************
   * Draw to top right viewport
-  ****************************/
+  *************************************************************/
+
   SDL_RenderSetViewport(renderer, &topRightViewport);
   
   
@@ -103,7 +104,10 @@ void Screen::show(Player* player) {
   float x_offset = player->x - width;
   float y_offset = player->y - height;
 
-  drawShape(player->render(x_offset, y_offset));
+  // Hacky way to set player character to face up :D
+  int cameraAngle = player->angle + (270 - player->angle);
+  drawShape(player->render(x_offset, y_offset, cameraAngle));
+
 
   // Camera will follow the player and everything will be rendered
   // relative to it inside this viewport
@@ -115,7 +119,14 @@ void Screen::show(Player* player) {
 
   // Get the translated lines
   std::vector<Line> transLines = translateLines(lines, xOff, yOff);
-  drawLines(renderer, transLines);
+
+  // Get the rotated lines
+  Pixel anchor; 
+  anchor.x = player->x - x_offset;
+  anchor.y = player->y - y_offset;
+
+  std::vector<Line> rotatedLines = rotateLines(transLines, anchor, player->angle);
+  drawLines(renderer, rotatedLines);
   
   // Draw everything that's been rendered on the viewports
   SDL_RenderPresent(renderer);

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "shapes.h"
-#include "screen.h"
+#include "player.h"
 #include "math.h"
 
 Line::Line(float x1, float y1, float x2, float y2, SDL_Color color) {
@@ -48,13 +48,58 @@ std::vector<Line> translateLines(std::vector<Line> lines, float offX, float offY
   std::vector<Line> transLines;
 
   for (Line line : lines) {
+    // Translate the line according to the offsets
     line.x1 = line.x1 + offX; 
     line.x2 = line.x2 + offX; 
     line.y1 = line.y1 + offY; 
     line.y2 = line.y2 + offY;
+
     transLines.push_back(line);
   }
 
   return transLines;
+}
+
+// Rotate the lines according to the angle player is facing
+std::vector<Line> rotateLines(std::vector<Line> lines, Pixel anchor, int ogAngle) {
+  std::vector<Line> rotatedLines;
+
+  int angle = degToRad(ogAngle);
+  //int angle = player->angle;
+  
+  // The ends of the line
+  Pixel a, b;
+
+  Line newLine;
+  
+ 
+  for (Line line : lines) {
+    a.x = line.x1; a.y = line.y1;
+    b.x = line.x2; b.y = line.y2;
+
+    a = rotatePixel(anchor, a, angle);
+    b = rotatePixel(anchor, b, angle);
+
+    newLine.x1 = a.x; newLine.y1 = a.y;
+    newLine.x2 = b.x; newLine.y2 = b.y;
+    newLine.color = line.color;
+
+    rotatedLines.push_back(newLine);
+    //std::cerr << rotatedLines.size() << std::endl;
+
+  }
+
+  return rotatedLines;
+}
+
+// x1,y1 is the anchor point, x2,y2 rotates
+Pixel rotatePixel(Pixel anchorPoint, Pixel mover, int angle) {
+  Pixel rotated;
+  float c; // hypotenuse
+
+  c = getDistance(anchorPoint, mover);
+  rotated.x = mover.x - (std::sin(angle) * c);
+  rotated.y = mover.y - (std::cos(angle) * c);
+  return rotated;
 }
 

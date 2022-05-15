@@ -1,4 +1,9 @@
+#include "player.h"
 #pragma once
+
+struct Pixel {
+  float x; float y;
+};
 
 class Line {
   public:
@@ -18,3 +23,5 @@ class Line {
 void drawLine(SDL_Renderer* renderer, Line* line);
 void drawLines(SDL_Renderer* renderer, std::vector<Line> lines);
 std::vector<Line> translateLines(std::vector<Line> lines, float offX, float offY);
+std::vector<Line> rotateLines(std::vector<Line> lines, Pixel anchor, int angle);
+Pixel rotatePixel(Pixel anchorPoint, Pixel mover, int angle);

@@ -6,13 +6,8 @@
 #include "player.h"
 #include "camera.h"
 #include "shapes.h"
-
 #pragma once
 
-
-struct Pixel {
-  float x; float y;
-};
 
 class Screen {
   public:
