@@ -5,10 +5,14 @@
 
 #include "player.h"
 #include "camera.h"
+#include "shapes.h"
 
 #pragma once
 
 
+struct Pixel {
+  float x; float y;
+};
 
 class Screen {
   public:
@@ -16,18 +20,20 @@ class Screen {
     SDL_Window* window;
     SDL_Renderer* renderer;
     std::vector<SDL_FPoint> points;
-    // Define a rectangle
-    SDL_Rect rekt;
     Camera camera;
+
+    // Line testLine;
+    std::vector<Line> lines;
 
     // Create a viewports
     SDL_Rect topRightViewport;
     SDL_Rect topRightBorder;
+
     
 
     Screen();
 
-    void pixel(float x, float y);
+    //void pixel(float x, float y);
     void show(Player* player);
     void input(Player* player);
     void drawShape(std::vector<SDL_FPoint> pixels);

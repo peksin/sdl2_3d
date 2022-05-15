@@ -11,7 +11,7 @@ int main(int argc, char* args[]) {
   Screen screen;
   Player player;
   // player.draw(screen);
-  drawLine(screen, 0, 0, 300, 300);
+  //drawLine(screen, 0, 0, 300, 300);
 
   while (true) {
     screen.show(&player);

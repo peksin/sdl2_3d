@@ -6,7 +6,8 @@
 #include "screen.h"
 #include "player.h"
 #include "camera.h"
-
+#include "shapes.h"
+#include "math.h"
 
 // A pixel with 3d coordinates 
 struct vec3 {
@@ -14,16 +15,25 @@ struct vec3 {
 };
 
 
-
 // Screen dimension constants
-const int SCREEN_WIDTH = 1024;
-const int SCREEN_HEIGHT = 768;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+const int SCALE = 2;
 const int MVMT_SPEED = 1;
+
+const SDL_Color RED = {255, 0, 0, 255};
+const SDL_Color GREEN = {0, 255, 0, 255};
+const SDL_Color BLUE = {0, 0, 255, 255};
+const SDL_Color WHITE = {255, 255, 255, 255};
+const SDL_Color BLACK = {0, 0, 0, 255};
+
+
+
 
 Screen::Screen() {
   SDL_Init(SDL_INIT_VIDEO);
-  SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
-  SDL_RenderSetScale(renderer, 1, 1);
+  SDL_CreateWindowAndRenderer(SCREEN_WIDTH*SCALE, SCREEN_HEIGHT*SCALE, 0, &window, &renderer);
+  SDL_RenderSetScale(renderer, SCALE, SCALE);
 
   // Set top right viewport size
   topRightViewport.x = SCREEN_WIDTH / 2;
@@ -37,17 +47,24 @@ Screen::Screen() {
   topRightBorder.w = topRightViewport.w + 5;
   topRightBorder.h = topRightViewport.h + 5; 
 
+  // Set the level
+  Line line1(0, 0, 50, 50, GREEN);
+  Line line2(50, 50, 100, 110, BLUE);
+  Line line3(250, 150, 250, 250, GREEN);
+  lines.push_back(line1);
+  lines.push_back(line2);
+  lines.push_back(line3);
+  // testLine.x1 = 250;
+  // testLine.y1 = 150;
+  // testLine.x2 = 250;
+  // testLine.y2 = 250;
+  // testLine.color = GREEN;
 
-
-  rekt.x = 210;
-  rekt.y = 210;
-  rekt.w = 50;
-  rekt.h = 50;
 }
 
-void Screen::pixel(float x, float y) {
-  points.emplace_back(x, y);
-}
+// void Screen::pixel(float x, float y) {
+//   points.emplace_back(x, y);
+// }
 
 void Screen::show(Player* player) {
   // Clear out the screen with black
@@ -57,27 +74,25 @@ void Screen::show(Player* player) {
   /*****************************
   * Draw to fullscreen viewport
   *****************************/
-  SDL_RenderSetScale(renderer, 1, 1);
+  //SDL_RenderSetScale(renderer, 1, 1);
   SDL_RenderSetViewport(renderer, nullptr);
   
   // Draw viewport borders
   SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderDrawRect(renderer, &topRightBorder);
   
-  SDL_RenderDrawRect(renderer, &rekt);
 
   drawShape(player->render());
+  
+  // Draw the level
+  drawLines(renderer, lines);
+  //drawLine(renderer, &testLine);
   
   /****************************
   * Draw to top right viewport
   ****************************/
-  SDL_RenderSetScale(renderer, 1, 1);
   SDL_RenderSetViewport(renderer, &topRightViewport);
   
-  // Camera will follow the player and everything will be rendered
-  // relative to it inside this viewport
-  camera.x = player->x;
-  camera.y = player->y;
   
   // Calculate center of viewport
   float width = topRightViewport.w / 2;
@@ -89,13 +104,18 @@ void Screen::show(Player* player) {
   float y_offset = player->y - height;
 
   drawShape(player->render(x_offset, y_offset));
-  
-  rekt.x -= x_offset;
-  rekt.y -= y_offset;
-  SDL_RenderDrawRect(renderer, &rekt);
 
-  rekt.x += x_offset;
-  rekt.y += y_offset;
+  // Camera will follow the player and everything will be rendered
+  // relative to it inside this viewport
+  camera.x = player->x;
+  camera.y = player->y;
+
+  float xOff = -camera.x + width;
+  float yOff = -camera.y + height;
+
+  // Get the translated lines
+  std::vector<Line> transLines = translateLines(lines, xOff, yOff);
+  drawLines(renderer, transLines);
   
   // Draw everything that's been rendered on the viewports
   SDL_RenderPresent(renderer);
@@ -111,8 +131,10 @@ void Screen::input(Player* player) {
     }
 
     if (e.type == SDL_KEYDOWN) {
-      std::cerr << "Button pressed: ";
-      std::cerr << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
+      //std::cerr << "Button pressed: ";
+      //std::cerr << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
+      //std::cerr << "Player coordinates: ";
+      //std::cerr << "x: " << player->x << " | y: " << player->y << std::endl;
       switch (e.key.keysym.sym) {
         case SDLK_UP: // MOVE FORWARD
           player->walk(MVMT_SPEED);
