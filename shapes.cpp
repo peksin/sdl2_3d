@@ -44,6 +44,10 @@ void drawLines(SDL_Renderer* renderer, std::vector<Line> lines) {
   }
 }
 
+void drawPixel(SDL_Renderer* renderer, Pixel pixel) {
+  SDL_RenderDrawPointF(renderer, pixel.x, pixel.y);
+}
+
 std::vector<Line> translateLines(std::vector<Line> lines, float offX, float offY) {
   std::vector<Line> transLines;
 
@@ -61,10 +65,10 @@ std::vector<Line> translateLines(std::vector<Line> lines, float offX, float offY
 }
 
 // Rotate the lines according to the angle player is facing
-std::vector<Line> rotateLines(std::vector<Line> lines, Pixel anchor, int ogAngle) {
+std::vector<Line> rotateLines(std::vector<Line> lines, Pixel anchor, float ogAngle) {
   std::vector<Line> rotatedLines;
 
-  int angle = degToRad(ogAngle);
+  float angle = degToRad(ogAngle);
   //int angle = player->angle;
   
   // The ends of the line
@@ -93,13 +97,42 @@ std::vector<Line> rotateLines(std::vector<Line> lines, Pixel anchor, int ogAngle
 }
 
 // x1,y1 is the anchor point, x2,y2 rotates
-Pixel rotatePixel(Pixel anchorPoint, Pixel mover, int angle) {
+// Takes the angle in degrees
+Pixel rotatePixel(Pixel anchorPoint, Pixel mover, float angle) {
+  float radAngle = degToRad(angle);
   Pixel rotated;
-  float c; // hypotenuse
+  Pixel origo;
+  origo.x = 0;
+  origo.y = 0;
 
-  c = getDistance(anchorPoint, mover);
-  rotated.x = mover.x - (std::sin(angle) * c);
-  rotated.y = mover.y - (std::cos(angle) * c);
+  
+  rotated.y = std::cos(radAngle) * mover.x + std::sin(radAngle) * mover.y;
+  rotated.x = std::sin(radAngle) * mover.x - std::cos(radAngle) * mover.y;
+  float distmover = getDistance(anchorPoint, mover);
+  float distRotated = getDistance(anchorPoint, rotated);
+  float distOrigo = getDistance(origo, rotated); 
+
+  rotated.y = rotated.y - anchorPoint.y;
+  rotated.x = anchorPoint.x - rotated.x;
+
   return rotated;
+}
+
+// // x1,y1 is the anchor point, x2,y2 rotates
+// Pixel rotatePixel(Pixel anchorPoint, Pixel mover, float angle) {
+//   Pixel rotated;
+//   float c; // hypotenuse
+
+//   c = getDistance(anchorPoint, mover);
+//   rotated.x = anchorPoint.x - (std::sin(angle) * c);
+//   rotated.y = mover.y - (std::cos(angle) * c);
+//   return rotated;
+// }
+
+Pixel translatePixel(Pixel pixel, float offX, float offY) {
+  Pixel translatedPixel;
+  translatedPixel.x = pixel.x + offX;
+  translatedPixel.y = pixel.y + offY;
+  return translatedPixel;
 }
 

@@ -22,6 +22,8 @@ class Line {
 //void drawLine(Screen &screen, float x1, float y1, float x2, float y2);
 void drawLine(SDL_Renderer* renderer, Line* line);
 void drawLines(SDL_Renderer* renderer, std::vector<Line> lines);
+void drawPixel(SDL_Renderer* renderer, Pixel pixel);
 std::vector<Line> translateLines(std::vector<Line> lines, float offX, float offY);
-std::vector<Line> rotateLines(std::vector<Line> lines, Pixel anchor, int angle);
-Pixel rotatePixel(Pixel anchorPoint, Pixel mover, int angle);
+std::vector<Line> rotateLines(std::vector<Line> lines, Pixel anchor, float angle);
+Pixel rotatePixel(Pixel anchorPoint, Pixel mover, float angle);
+Pixel translatePixel(Pixel pixel, float offX, float offY);

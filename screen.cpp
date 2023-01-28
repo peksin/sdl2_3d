@@ -26,6 +26,7 @@ const SDL_Color GREEN = {0, 255, 0, 255};
 const SDL_Color BLUE = {0, 0, 255, 255};
 const SDL_Color WHITE = {255, 255, 255, 255};
 const SDL_Color BLACK = {0, 0, 0, 255};
+const SDL_Color YELLOW = {255, 255, 0, 255};
 
 
 
@@ -50,10 +51,10 @@ Screen::Screen() {
   // Set the level
   Line line1(0, 0, 50, 50, GREEN);
   Line line2(50, 50, 100, 110, BLUE);
-  Line line3(250, 150, 250, 250, GREEN);
+  //Line line3(250, 150, 250, 250, GREEN);
   lines.push_back(line1);
   lines.push_back(line2);
-  lines.push_back(line3);
+  //lines.push_back(line3);
   // testLine.x1 = 250;
   // testLine.y1 = 150;
   // testLine.x2 = 250;
@@ -83,6 +84,16 @@ void Screen::show(Player* player) {
   
 
   drawShape(player->render());
+
+  SDL_SetRenderDrawColor(renderer, 255, 255, 0, SDL_ALPHA_OPAQUE);
+  Pixel debug;
+  debug.x = 250; debug.y = 200;
+
+  Pixel debug2;
+  debug2.x = 230; debug2.y = 220;
+
+  drawPixel(renderer, debug);
+  drawPixel(renderer, debug2);
   
   // Draw the level
   drawLines(renderer, lines);
@@ -117,16 +128,29 @@ void Screen::show(Player* player) {
   float xOff = -camera.x + width;
   float yOff = -camera.y + height;
 
-  // Get the translated lines
-  std::vector<Line> transLines = translateLines(lines, xOff, yOff);
+  //Get the translated lines
+  //std::vector<Line> transLines = translateLines(lines, xOff, yOff);
+  
+  // DEBUG ////////////////////////////////////
+  // Draw debug pixel
 
   // Get the rotated lines
   Pixel anchor; 
   anchor.x = player->x - x_offset;
   anchor.y = player->y - y_offset;
+  debug = translatePixel(debug, xOff, yOff);
+  debug = rotatePixel(anchor, debug, player->angle);
+  debug2 = translatePixel(debug2, xOff, yOff);
+  debug2 = rotatePixel(anchor, debug2, player->angle);
+  SDL_SetRenderDrawColor(renderer, 255, 255, 0, SDL_ALPHA_OPAQUE);
 
-  std::vector<Line> rotatedLines = rotateLines(transLines, anchor, player->angle);
-  drawLines(renderer, rotatedLines);
+  drawPixel(renderer, debug);
+  drawPixel(renderer, debug2);
+
+  /* END DEBUG ********************************/
+
+  //std::vector<Line> rotatedLines = rotateLines(transLines, anchor, player->angle);
+  //drawLines(renderer, rotatedLines);
   
   // Draw everything that's been rendered on the viewports
   SDL_RenderPresent(renderer);
